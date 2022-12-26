@@ -1,6 +1,7 @@
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -9,6 +10,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { GlobalLoading } from "~/components/GlobalLoading";
+import { Header } from "~/components/Header";
 
 import { getUser } from "./session.server";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
@@ -36,9 +38,12 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="h-full">
-        <GlobalLoading></GlobalLoading>
-        <Outlet />
+      <body className="h-full bg-stone-800 text-white">
+        <GlobalLoading />
+        <Header />
+        <main className="p-6">
+          <Outlet />
+        </main>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
