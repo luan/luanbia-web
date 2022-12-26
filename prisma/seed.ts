@@ -1,4 +1,4 @@
-import type { Account, Player } from "@prisma/client";
+import type { Account, Player, Town } from "@prisma/client";
 import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { createHash } from "crypto";
@@ -11,6 +11,11 @@ enum Vocations {
   Druid = 2,
   Paladin = 3,
   Knight = 4,
+
+  MasterSorcerer = 5,
+  ElderDruid = 6,
+  RoyalPaladin = 7,
+  EliteKnight = 8,
 }
 
 enum Sex {
@@ -28,9 +33,11 @@ function getHealth(level: number, vocation: Vocations): number {
   if (level >= 9) {
     switch (vocation) {
       case Vocations.Paladin:
+      case Vocations.RoyalPaladin:
         health += (level - 8) * 10;
         break;
       case Vocations.Knight:
+      case Vocations.EliteKnight:
         health += (level - 8) * 15;
         break;
     }
@@ -44,9 +51,12 @@ function getMana(level: number, vocation: Vocations): number {
     switch (vocation) {
       case Vocations.Sorcerer:
       case Vocations.Druid:
+      case Vocations.MasterSorcerer:
+      case Vocations.ElderDruid:
         mana += (level - 8) * 30;
         break;
       case Vocations.Paladin:
+      case Vocations.RoyalPaladin:
         mana += (level - 8) * 15;
         break;
     }
@@ -79,6 +89,7 @@ type AccountInput = Pick<
   Account,
   "id" | "name" | "email" | "password" | "type"
 >;
+type TownInput = Pick<Town, "id" | "name"> & Partial<Town>;
 
 function getPlayerData({
   id,
@@ -88,6 +99,7 @@ function getPlayerData({
   sex,
   accountId,
   groupId,
+  townId,
 }: {
   id: number;
   name: string;
@@ -96,6 +108,7 @@ function getPlayerData({
   sex: Sex;
   accountId: number;
   groupId: GroupId;
+  townId: number;
 }): PlayerInput {
   const health = getHealth(level, vocation);
   const healthmax = health;
@@ -109,8 +122,8 @@ function getPlayerData({
     level,
     vocation,
     sex,
-    account_id: accountId,
-    group_id: groupId,
+    accountId,
+    groupId,
     health,
     healthmax,
     experience,
@@ -123,75 +136,85 @@ function getPlayerData({
     looklegs: 39,
     looktype: groupId === GroupId.God ? 75 : 129,
     conditions: Buffer.alloc(0),
+    townId,
   };
 }
+
+let lastAccountId = 0;
+let lastPlayerId = 0;
+let lastTownId = 0;
+
 const samplePlayers: PlayerInput[] = [
   getPlayerData({
-    id: 1,
+    id: ++lastPlayerId,
     name: "Rook Sample",
     level: 1,
     vocation: Vocations.None,
     sex: Sex.Male,
     accountId: 1,
     groupId: GroupId.Player,
+    townId: 1,
   }),
   getPlayerData({
-    id: 2,
+    id: ++lastPlayerId,
     name: "Sorcerer Sample",
     level: 8,
     vocation: Vocations.Sorcerer,
     sex: Sex.Male,
     accountId: 1,
     groupId: GroupId.Player,
+    townId: 1,
   }),
   getPlayerData({
-    id: 3,
+    id: ++lastPlayerId,
     name: "Druid Sample",
     level: 8,
     vocation: Vocations.Druid,
     sex: Sex.Male,
     accountId: 1,
     groupId: GroupId.Player,
+    townId: 1,
   }),
   getPlayerData({
-    id: 4,
+    id: ++lastPlayerId,
     name: "Paladin Sample",
     level: 8,
     vocation: Vocations.Paladin,
     sex: Sex.Male,
     accountId: 1,
     groupId: GroupId.Player,
+    townId: 1,
   }),
   getPlayerData({
-    id: 5,
+    id: ++lastPlayerId,
     name: "Knight Sample",
     level: 8,
     vocation: Vocations.Knight,
     sex: Sex.Male,
     accountId: 1,
     groupId: GroupId.Player,
+    townId: 1,
   }),
   getPlayerData({
-    id: 6,
+    id: ++lastPlayerId,
     name: "God",
     level: 2,
     vocation: Vocations.None,
-    sex: Sex.Male,
+    sex: Sex.Female,
     accountId: 1,
     groupId: GroupId.God,
+    townId: 1,
   }),
 ];
 
-async function generatePlayer(accountId: number): Promise<PlayerInput> {
-  const latestPlayer = await prisma.player.findFirst({
-    orderBy: { id: "desc" },
-  });
-  const id = latestPlayer ? latestPlayer.id + 1 : 1;
+function generatePlayer(accountId: number) {
+  const id = ++lastPlayerId;
   const name = faker.name.firstName();
   const level = faker.datatype.number({ min: 1, max: 400 });
-  const vocation = faker.datatype.number({ min: 0, max: 4 }) as Vocations;
+  const vocation = faker.datatype.number({ min: 0, max: 8 }) as Vocations;
   const sex = faker.datatype.number({ min: 0, max: 1 }) as Sex;
   const groupId = GroupId.Player;
+  const townId = faker.datatype.number({ min: 1, max: lastTownId });
   return getPlayerData({
     id,
     name,
@@ -200,19 +223,17 @@ async function generatePlayer(accountId: number): Promise<PlayerInput> {
     sex,
     accountId,
     groupId,
+    townId,
   });
 }
 
-async function generateAccount(): Promise<AccountInput> {
+function generateAccount(): AccountInput {
   const name = faker.internet.userName();
   const email = faker.internet.email();
   const password = createHash("sha1")
     .update(faker.internet.password())
     .digest("hex");
-  const lastAccount = await prisma.account.findFirst({
-    orderBy: { id: "desc" },
-  });
-  const id = lastAccount ? lastAccount.id + 1 : 1;
+  const id = ++lastAccountId;
 
   return {
     id,
@@ -221,6 +242,12 @@ async function generateAccount(): Promise<AccountInput> {
     password,
     type: 1,
   };
+}
+
+function generateTown(): TownInput {
+  const id = ++lastTownId;
+  const name = faker.address.city();
+  return { id, name };
 }
 
 async function seed() {
@@ -239,6 +266,20 @@ async function seed() {
     });
   }
 
+  console.log(`Adding 10 random towns... 🏘️`);
+  for (let i = 0; i < 10; i++) {
+    let town: TownInput;
+    do {
+      town = generateTown();
+    } while (await prisma.town.findUnique({ where: { id: town.id } }));
+
+    await prisma.town.upsert({
+      where: { id: town.id },
+      create: town,
+      update: town,
+    });
+  }
+
   console.log(`Adding God Account... 🙏`);
   const godAccount = {
     id: 1,
@@ -248,7 +289,7 @@ async function seed() {
     type: 5,
   };
   await prisma.account.upsert({
-    where: { id: 1 },
+    where: { id: ++lastAccountId },
     create: godAccount,
     update: godAccount,
   });
@@ -263,7 +304,7 @@ async function seed() {
 
   console.log(`Adding 10 random accounts... 🤖`);
   for (let i = 0; i < 10; i++) {
-    const account = await generateAccount();
+    const account = generateAccount();
     await prisma.account.upsert({
       where: { id: account.id },
       create: account,
@@ -273,7 +314,7 @@ async function seed() {
     for (let j = 0; j < 5; j++) {
       let player: PlayerInput;
       while (true) {
-        player = await generatePlayer(account.id);
+        player = generatePlayer(account.id);
         const existingPlayer = await prisma.player.findFirst({
           where: { name: player.name },
         });
