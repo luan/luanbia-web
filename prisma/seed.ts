@@ -137,6 +137,7 @@ function getPlayerData({
     looktype: groupId === GroupId.God ? 75 : 129,
     conditions: Buffer.alloc(0),
     townId,
+    lastlogin: BigInt(Math.floor(faker.date.past().getTime() / 1000)),
   };
 }
 
