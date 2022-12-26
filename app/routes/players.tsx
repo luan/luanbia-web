@@ -39,7 +39,7 @@ export default function PlayersPage() {
               <input
                 type="text"
                 name="name"
-                className="w-2/3 border border-gray-300 rounded-md px-4 py-1"
+                className="w-2/3 border border-gray-300 rounded-md px-4 py-1 text-stone-900"
               />
               <button className="w-1/3 px-4 py-1 bg-cyan-600 text-cyan-50 rounded-md">
                 Lookup
@@ -50,18 +50,22 @@ export default function PlayersPage() {
         <div className="w-48 font-bold">Players</div>
         <div className="flex-1">
           <ul className="list-none list-inside">
-            {players.map((player) => (
-              <li key={player.id}>
-                <NavLink
-                  to={`/players/${player.name}`}
-                  className={({ isActive }) =>
-                    cx(isActive ? "text-cyan-100 italic" : "")
-                  }
-                >
-                  {player.name} | {player.vocation} | {player.level}
-                </NavLink>
-              </li>
-            ))}
+            {players.length > 0 ? (
+              players.map((player) => (
+                <li key={player.id}>
+                  <NavLink
+                    to={`/players/${player.name}`}
+                    className={({ isActive }) =>
+                      cx(isActive ? "text-cyan-100 italic" : "")
+                    }
+                  >
+                    {player.name} | {player.vocation} | {player.level}
+                  </NavLink>
+                </li>
+              ))
+            ) : (
+              <li>No players found</li>
+            )}
           </ul>
         </div>
       </main>
