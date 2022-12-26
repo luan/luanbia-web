@@ -11,6 +11,7 @@ import {
 } from "@remix-run/react";
 import { GlobalLoading } from "~/components/GlobalLoading";
 import { Header } from "~/components/Header";
+import { cx } from "~/utils";
 
 import { getUser } from "./session.server";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
@@ -38,10 +39,16 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="h-full bg-stone-800 text-white">
+      <body className="bg-stone-800 text-white">
         <GlobalLoading />
         <Header />
-        <main className="p-6">
+        <main
+          className={cx(
+            "h-full min-h-screen rounded-xl mx-6 p-6",
+            "bg-gradient-to-tl from-amber-900/50 to-stone-600/50 backdrop-blur-sm",
+            "outline outline-2 outline-amber-600"
+          )}
+        >
           <Outlet />
         </main>
         <ScrollRestoration />

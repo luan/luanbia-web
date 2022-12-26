@@ -29,7 +29,9 @@ function AttributeRow({
       <div className="w-48 font-bold">{label}</div>
       <div className="flex-1">
         {search ? (
-          <Link to={`/players?${search}=${value}`}>{value}</Link>
+          <Link to={`/players?${search}=${value}`} className="text-cyan-200">
+            {value}
+          </Link>
         ) : (
           value
         )}
