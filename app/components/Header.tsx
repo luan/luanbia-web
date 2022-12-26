@@ -29,7 +29,7 @@ function HeaderLink({
 export function Header() {
   return (
     <header className="flex flex-row max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center">
-      <div className="flex flex-row justify-center items-center relative select-none">
+      <div className="flex flex-row justify-center items-center relative select-none py-2">
         <img
           className="h-48 w-48 drop-shadow-lg"
           src="/assets/logo.png"
