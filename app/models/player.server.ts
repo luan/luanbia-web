@@ -27,6 +27,7 @@ export async function getPlayers(filter: {
   const players = await prisma.player.findMany({
     select: { id: true, name: true, level: true, vocation: true },
     orderBy: { experience: "desc" },
+    take: 20,
     where: {
       name: {
         contains: filter.name ?? "",

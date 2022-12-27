@@ -44,7 +44,7 @@ export default function PlayerPage() {
   const { player } = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex h-full min-h-screen flex-col">
+    <div className="flex flex-col">
       <section className="flex flex-col">
         <h1 className="text-lg font-bold">Character Information</h1>
         <hr className="my-2" />

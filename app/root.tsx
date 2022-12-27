@@ -45,7 +45,7 @@ export default function App() {
         <Header />
         <main
           className={cx(
-            "h-full min-h-screen rounded-xl mx-6 p-6",
+            "rounded-xl mx-6 p-6",
             "bg-gradient-to-tl from-amber-900/50 to-stone-600/50 backdrop-blur-sm",
             "outline outline-2 outline-amber-600"
           )}
