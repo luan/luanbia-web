@@ -35,7 +35,7 @@ export function Header() {
           src="/assets/logo.png"
           alt="Luanbia Home"
         />
-        <span className="absolute left-24 top-17 text-4xl font-serif text-orange-100 opacity-75">
+        <span className="absolute left-24 top-17 text-4xl font-medieval text-orange-50 drop-shadow-lg">
           uanbia
         </span>
       </div>

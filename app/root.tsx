@@ -37,6 +37,11 @@ export default function App() {
       <head>
         <Meta />
         <Links />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Nanum+Gothic:wght@400;700;800&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="bg-stone-800 text-white">
         <GlobalLoading />
